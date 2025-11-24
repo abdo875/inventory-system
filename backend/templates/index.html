@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventory System</title>
+</head>
+<body>
+    <h1>Inventory</h1>
+
+    <h3>Add Product</h3>
+    <form action="/add" method="post">
+        <input name="name" placeholder="Product Name" required>
+        <input name="quantity" type="number" required>
+        <button type="submit">Add</button>
+    </form>
+
+    <h3>Products List</h3>
+    <ul>
+        {% for p in products %}
+        <li>{{ p.id }} - {{ p.name }} ({{ p.quantity }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
