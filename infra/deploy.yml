@@ -1,0 +1,51 @@
+- hosts: app
+  become: true
+  vars:
+    backend_image: "{{ image_backend | default('abdelrahman121/inventory-backend:latest') }}"
+  tasks:
+    - name: update apt
+      apt: update_cache=yes force_apt_get=yes
+
+    - name: Ensure docker installed
+      apt:
+        name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release]
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add docker repo
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install docker
+      apt:
+        name: [docker-ce, docker-ce-cli, containerd.io]
+        state: latest
+        update_cache: yes
+
+    - name: install docker-compose plugin
+      apt:
+        name: docker-compose-plugin
+        state: present
+
+    - name: create app dir
+      file:
+        path: /opt/inventory
+        state: directory
+        owner: ubuntu
+        mode: '0755'
+
+    - name: pull backend image
+      command: docker pull {{ backend_image }}
+
+    - name: stop & remove old container
+      shell: |
+        docker rm -f inventory-backend || true
+
+    - name: run backend container
+      shell: |
+        docker run -d --name inventory-backend -p 8000:8000 --restart always {{ backend_image }}

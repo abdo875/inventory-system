@@ -1,6 +1,8 @@
 services:
   backend:
     build: ./backend
-    container_name: backend
+    container_name: inventory-backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
