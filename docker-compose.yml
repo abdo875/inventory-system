@@ -4,5 +4,13 @@ services:
     container_name: inventory-backend
     ports:
       - "8000:8000"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
     volumes:
-      - ./backend:/app
+      - ./prometheus:/etc/prometheus  # Mount the directory, not the file
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
