@@ -39,6 +39,7 @@
             font-weight: bold;
             color: #2c3e50;
             letter-spacing: 2px;
+            cursor: pointer;
         }
 
         .nav-links {
@@ -67,17 +68,52 @@
             cursor: pointer;
             font-size: 1.2rem;
             transition: transform 0.3s;
+            position: relative;
         }
 
         .nav-icons span:hover {
             transform: scale(1.1);
         }
 
+        /* Cart badge for item count */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
         .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1600') center/cover;
+            position: relative;
             color: white;
             padding: 6rem 2rem;
             text-align: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(102, 126, 234, 0.7);
+            z-index: 1;
+        }
+
+        .hero h1, .hero p, .hero .cta-button {
+            position: relative;
+            z-index: 2;
         }
 
         .hero h1 {
@@ -163,10 +199,18 @@
             z-index: 2;
         }
 
-        .cat1 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .cat2 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .cat3 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        .cat4 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .cat1 { 
+            background: url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800') center/cover;
+        }
+        .cat2 { 
+            background: url('https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=800') center/cover;
+        }
+        .cat3 { 
+            background: url('https://images.unsplash.com/photo-1523779917675-b6ed3a42a561?w=800') center/cover;
+        }
+        .cat4 { 
+            background: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800') center/cover;
+        }
 
         .featured-products {
             max-width: 1200px;
@@ -284,9 +328,9 @@
 <body>
     <header>
         <nav>
-            <div class="logo">LUXE</div>
+            <div class="logo" onclick="window.location.href='/'">LUXE</div>
             <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
+                <li><a href="/">Home</a></li>
                 <li><a href="#shop">Shop</a></li>
                 <li><a href="#categories">Categories</a></li>
                 <li><a href="#about">About</a></li>
@@ -295,7 +339,11 @@
             <div class="nav-icons">
                 <span>🔍</span>
                 <span>❤️</span>
-                <span>🛒</span>
+                <!-- Shopping Cart Icon - Clickable to go to cart page -->
+                <span onclick="window.location.href='/cart'" style="position: relative;">
+                    🛒
+                    <span class="cart-badge" id="cartCount">0</span>
+                </span>
             </div>
         </nav>
     </header>
@@ -328,35 +376,35 @@
         <h2 class="section-title">Featured Products</h2>
         <div class="product-grid">
             <div class="product-card">
-                <div class="product-image">👔</div>
+                <div class="product-image" style="background: url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600') center/cover;"></div>
                 <div class="product-info">
                     <h3 class="product-title">Classic Blazer</h3>
                     <div class="product-price">$129.99</div>
-                    <button class="add-to-cart">Add to Cart</button>
+                    <button class="add-to-cart" onclick="addToCart('Classic Blazer', 129.99)">Add to Cart</button>
                 </div>
             </div>
             <div class="product-card">
-                <div class="product-image">👗</div>
+                <div class="product-image" style="background: url('https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600') center/cover;"></div>
                 <div class="product-info">
                     <h3 class="product-title">Summer Dress</h3>
                     <div class="product-price">$89.99</div>
-                    <button class="add-to-cart">Add to Cart</button>
+                    <button class="add-to-cart" onclick="addToCart('Summer Dress', 89.99)">Add to Cart</button>
                 </div>
             </div>
             <div class="product-card">
-                <div class="product-image">👟</div>
+                <div class="product-image" style="background: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600') center/cover;"></div>
                 <div class="product-info">
                     <h3 class="product-title">Sport Sneakers</h3>
                     <div class="product-price">$149.99</div>
-                    <button class="add-to-cart">Add to Cart</button>
+                    <button class="add-to-cart" onclick="addToCart('Sport Sneakers', 149.99)">Add to Cart</button>
                 </div>
             </div>
             <div class="product-card">
-                <div class="product-image">👜</div>
+                <div class="product-image" style="background: url('https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600') center/cover;"></div>
                 <div class="product-info">
                     <h3 class="product-title">Leather Bag</h3>
                     <div class="product-price">$199.99</div>
-                    <button class="add-to-cart">Add to Cart</button>
+                    <button class="add-to-cart" onclick="addToCart('Leather Bag', 199.99)">Add to Cart</button>
                 </div>
             </div>
         </div>
@@ -371,10 +419,10 @@
             <div class="footer-section">
                 <h3>Quick Links</h3>
                 <ul>
-                    <li><a href="#">Shop</a></li>
-                    <li><a href="#">Categories</a></li>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="#shop">Shop</a></li>
+                    <li><a href="#categories">Categories</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -393,5 +441,32 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Update cart count on page load
+        function updateCartCount() {
+            const cartCount = localStorage.getItem('cartCount') || 0;
+            document.getElementById('cartCount').textContent = cartCount;
+        }
+
+        // Add to cart function
+        function addToCart(productName, price) {
+            // Get current cart count
+            let cartCount = parseInt(localStorage.getItem('cartCount') || 0);
+            cartCount++;
+            
+            // Save to localStorage
+            localStorage.setItem('cartCount', cartCount);
+            
+            // Update the badge
+            document.getElementById('cartCount').textContent = cartCount;
+            
+            // Optional: Show a notification
+            alert(`${productName} added to cart!`);
+        }
+
+        // Initialize cart count on page load
+        updateCartCount();
+    </script>
 </body>
 </html>
