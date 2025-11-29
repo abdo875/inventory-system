@@ -7,13 +7,6 @@ pipeline {
   }
 
   stages {
-
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-
     stage('Docker Login') {
       steps {
         withCredentials([usernamePassword(
