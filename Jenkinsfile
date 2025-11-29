@@ -4,6 +4,7 @@ pipeline {
   environment {
     DOCKERHUB = "abdelrahman121"
     IMAGE = "${DOCKERHUB}/inventory-backend"
+    PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   }
 
   stages {
@@ -21,15 +22,19 @@ pipeline {
           usernameVariable: 'DOCKER_USER',
           passwordVariable: 'DOCKER_PASS'
         )]) {
-          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+          sh '''
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+          '''
         }
       }
     }
 
     stage('Build') {
       steps {
-        sh 'DOCKER_BUILDKIT=0 docker build -t ${IMAGE}:${GIT_COMMIT} ./backend'
-        sh 'docker tag ${IMAGE}:${GIT_COMMIT} ${IMAGE}:latest'
+        sh '''
+          DOCKER_BUILDKIT=0 docker build -t ${IMAGE}:${GIT_COMMIT} ./backend
+          docker tag ${IMAGE}:${GIT_COMMIT} ${IMAGE}:latest
+        '''
       }
     }
 
@@ -46,23 +51,34 @@ pipeline {
           usernameVariable: 'DOCKER_USER',
           passwordVariable: 'DOCKER_PASS'
         )]) {
-          sh 'docker push ${IMAGE}:${GIT_COMMIT}'
-          sh 'docker push ${IMAGE}:latest'
+          sh '''
+            docker push ${IMAGE}:${GIT_COMMIT}
+            docker push ${IMAGE}:latest
+          '''
         }
       }
     }
 
     stage('Deploy') {
-      steps {
-        sh 'ansible-playbook -i infra/hosts infra/deploy.yml --extra-vars "image_backend=${IMAGE}:latest"'
-      }
+  steps {
+    withCredentials([sshUserPrivateKey(
+      credentialsId: 'aws-key',
+      keyFileVariable: 'SSH_KEY',
+      usernameVariable: 'SSH_USER'
+    )]) {
+      sh '''
+        ansible-playbook -i infra/hosts infra/deploy.yml \
+        --extra-vars "image_backend=${IMAGE}:latest" \
+        --extra-vars "ansible_ssh_user=$SSH_USER ansible_ssh_private_key_file=$SSH_KEY"
+      '''
     }
-
   }
+}
+
 
   post {
     always {
-      sh 'docker image prune -f'
+      sh 'docker image prune -f || true'
     }
   }
 }
