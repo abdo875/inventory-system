@@ -60,21 +60,22 @@ pipeline {
     }
 
     stage('Deploy') {
-  steps {
-    withCredentials([sshUserPrivateKey(
-      credentialsId: 'aws-key',
-      keyFileVariable: 'SSH_KEY',
-      usernameVariable: 'SSH_USER'
-    )]) {
-      sh '''
-        ansible-playbook -i infra/hosts infra/deploy.yml \
-        --extra-vars "image_backend=${IMAGE}:latest" \
-        --extra-vars "ansible_ssh_user=$SSH_USER ansible_ssh_private_key_file=$SSH_KEY"
-      '''
+      steps {
+        withCredentials([sshUserPrivateKey(
+          credentialsId: 'aws-key',
+          keyFileVariable: 'SSH_KEY',
+          usernameVariable: 'SSH_USER'
+        )]) {
+          sh '''
+            ansible-playbook -i infra/hosts infra/deploy.yml \
+            --extra-vars "image_backend=${IMAGE}:latest" \
+            --extra-vars "ansible_ssh_user=$SSH_USER ansible_ssh_private_key_file=$SSH_KEY"
+          '''
+        }
+      }
     }
-  }
-}
 
+  }
 
   post {
     always {
