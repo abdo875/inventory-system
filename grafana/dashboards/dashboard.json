@@ -1,0 +1,140 @@
+{
+  "id": null,
+  "uid": "inventory-monitoring",
+  "title": "Inventory App Monitoring",
+  "tags": ["inventory", "fastapi", "prometheus"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total Requests (All Routes)",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(backend_requests_total)",
+          "legendFormat": "Requests"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Requests Per Route",
+      "gridPos": { "x": 6, "y": 0, "w": 18, "h": 8 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (route, method) (rate(backend_requests_total[2m]))",
+          "legendFormat": "{{route}} {{method}}"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Request Duration (Histogram)",
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.90, sum(rate(backend_request_duration_seconds_bucket[2m])) by (le, route))",
+          "legendFormat": "p90 - {{route}}"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(backend_request_duration_seconds_bucket[2m])) by (le, route))",
+          "legendFormat": "p50 - {{route}}"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Signup Success Rate",
+      "gridPos": { "x": 0, "y": 16, "w": 6, "h": 4 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(user_actions_total{action=\"signup\",status=\"success\"})",
+          "legendFormat": "Successful"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Signup Failures",
+      "gridPos": { "x": 6, "y": 16, "w": 6, "h": 4 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(user_actions_total{action=\"signup\",status=\"failed\"})",
+          "legendFormat": "Failed"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "User Login Activity",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(user_actions_total{action=\"login\",status=\"success\"}[2m])",
+          "legendFormat": "Login Success"
+        },
+        {
+          "expr": "rate(user_actions_total{action=\"login\",status=\"failed\"}[2m])",
+          "legendFormat": "Login Failed"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Cart Operations Rate",
+      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (operation, status) (rate(cart_operations_total[2m]))",
+          "legendFormat": "{{operation}} ({{status}})"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Product Operations",
+      "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(product_operations_total[2m])",
+          "legendFormat": "{{operation}}"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Total Product Views",
+      "gridPos": { "x": 0, "y": 32, "w": 6, "h": 4 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(product_operations_total{operation=\"view\"})",
+          "legendFormat": "Views"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Admin Dashboard Visits",
+      "gridPos": { "x": 6, "y": 32, "w": 6, "h": 4 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(backend_requests_total{route=\"/admin/dashboard\"})",
+          "legendFormat": "Admin Visits"
+        }
+      ]
+    }
+  ]
+}
