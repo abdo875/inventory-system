@@ -9,10 +9,12 @@ pipeline {
   stages {
 
     stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    steps {
+        sh 'git clone https://github.com/abdo875/inventory-system.git'
+        sh 'ls -la'
     }
+}
+
 
     stage('Docker Login') {
       steps {
