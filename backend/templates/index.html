@@ -1,23 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Inventory System</title>
-</head>
-<body>
-    <h1>Inventory</h1>
+<!-- backend/templates/index.html -->
+{% extends "base.html" %}
 
-    <h3>Add Product</h3>
-    <form action="/add" method="post">
-        <input name="name" placeholder="Product Name" required>
-        <input name="quantity" type="number" required>
-        <button type="submit">Add</button>
-    </form>
+{% block title %}Admin Dashboard{% endblock %}
 
-    <h3>Products List</h3>
-    <ul>
-        {% for p in products %}
-        <li>{{ p.id }} - {{ p.name }} ({{ p.quantity }})</li>
+{% block content %}
+<h1>Admin Dashboard</h1>
+
+<table style="width:100%; border-collapse:collapse; margin-top:1rem;">
+    <thead>
+        <tr>
+            <th style="text-align:left; padding:0.5rem; border-bottom:1px solid #e5e7eb;">ID</th>
+            <th style="text-align:left; padding:0.5rem; border-bottom:1px solid #e5e7eb;">Name</th>
+            <th style="text-align:left; padding:0.5rem; border-bottom:1px solid #e5e7eb;">Price</th>
+            <th style="text-align:left; padding:0.5rem; border-bottom:1px solid #e5e7eb;">Stock</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td style="padding:0.5rem; border-bottom:1px solid #f3f4f6;">{{ product.id }}</td>
+            <td style="padding:0.5rem; border-bottom:1px solid #f3f4f6;">{{ product.name }}</td>
+            <td style="padding:0.5rem; border-bottom:1px solid #f3f4f6;">${{ "%.2f"|format(product.price) }}</td>
+            <td style="padding:0.5rem; border-bottom:1px solid #f3f4f6;">{{ product.stock }}</td>
+        </tr>
         {% endfor %}
-    </ul>
-</body>
-</html>
+    </tbody>
+</table>
+{% endblock %}

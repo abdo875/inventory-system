@@ -1,0 +1,30 @@
+<!-- templates/admin_product_form.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="page-title">Add New Product</h1>
+
+<form method="post" action="/admin/products/new" enctype="multipart/form-data" class="admin-form">
+    <label>
+        Name
+        <input type="text" name="name" required>
+    </label>
+    <label>
+        Description
+        <textarea name="description"></textarea>
+    </label>
+    <label>
+        Price
+        <input type="number" name="price" step="0.01" required>
+    </label>
+    <label>
+        Stock
+        <input type="number" name="stock" min="0" value="0">
+    </label>
+    <label>
+        Image
+        <input type="file" name="image" accept="image/*">
+    </label>
+    <button type="submit" class="btn btn-primary">Create Product</button>
+</form>
+{% endblock %}

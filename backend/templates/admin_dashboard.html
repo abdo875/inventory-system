@@ -1,0 +1,48 @@
+<!-- templates/admin_dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="page-title">Admin Dashboard</h1>
+
+<p>Welcome, {{ user.username }} (Admin)</p>
+
+<div class="admin-actions">
+    <a href="/admin/products/new" class="btn btn-primary">Add New Product</a>
+</div>
+
+<h2>Products</h2>
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>
+                    {% if product.image_url %}
+                        <img src="{{ product.image_url }}" class="admin-product-image">
+                    {% endif %}
+                </td>
+                <td>{{ product.name }}</td>
+                <td>${{ "%.2f" | format(product.price) }}</td>
+                <td>{{ product.stock }}</td>
+                <td>
+                    <form method="post" action="/admin/products/{{ product.id }}/delete" onsubmit="return confirm('Delete this product?');">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">No products yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

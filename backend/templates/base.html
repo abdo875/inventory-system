@@ -1,0 +1,32 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Inventory Store" }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav class="navbar">
+    <a href="/" class="logo">Inventory Store</a>
+    <div class="nav-right">
+        <a href="/cart">Cart</a>
+        {% if user %}
+            {% if user.is_admin %}
+                <a href="/admin/dashboard">Admin</a>
+            {% endif %}
+            <span class="nav-user">Hi, {{ user.username }}</span>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+        {% endif %}
+    </div>
+</nav>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

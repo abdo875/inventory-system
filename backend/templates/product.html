@@ -1,0 +1,42 @@
+<!-- templates/product.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="product-detail">
+    <div>
+        {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-detail-image">
+        {% else %}
+            <div class="product-detail-image placeholder">No Image</div>
+        {% endif %}
+    </div>
+    <div class="product-detail-info">
+        <h1>{{ product.name }}</h1>
+        <p class="product-price">${{ "%.2f" | format(product.price) }}</p>
+        <p>{{ product.description or "" }}</p>
+        <p>Stock: {{ product.stock }}</p>
+
+        {% if user %}
+            <div class="add-cart-section">
+                <label>Quantity:
+                    <input type="number" id="product-qty" value="1" min="1">
+                </label>
+                <button
+                    class="btn btn-primary"
+                    id="btn-add-to-cart"
+                    data-product-id="{{ product.id }}"
+                >
+                    Add to Cart
+                </button>
+            </div>
+        {% else %}
+            <p><a href="/login">Login</a> to add to cart.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script src="/static/js/cart.js"></script>
+<script>
+    setupAddToCartFromProductPage();
+</script>
+{% endblock %}

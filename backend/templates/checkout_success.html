@@ -1,0 +1,11 @@
+<!-- templates/checkout_success.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="page-title">Payment Successful</h1>
+<div class="checkout-success">
+    <p>Thank you for your purchase, {{ user.username }} 🎉</p>
+    <p>Total paid: <strong>${{ "%.2f" | format(amount) }}</strong></p>
+    <a href="/" class="btn btn-primary">Back to Home</a>
+</div>
+{% endblock %}

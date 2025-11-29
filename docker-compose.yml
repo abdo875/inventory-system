@@ -1,8 +1,14 @@
+version: "3.9"
+
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     container_name: inventory-backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    environment:
+      - ENV=production
+    restart: always

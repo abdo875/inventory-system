@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% if action == "create" %}
+    {% set page_title = "Create Product" %}
+{% else %}
+    {% set page_title = "Edit Product" %}
+{% endif %}
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<h1>{{ page_title }}</h1>
+
+<form method="post"
+      action="{% if action == 'create' %}/admin/products/new{% else %}/admin/products/{{ product.id }}/edit{% endif %}"
+      class="simple-form">
+
+    <label>Name
+        <input type="text" name="name" required value="{% if product %}{{ product.name }}{% endif %}">
+    </label>
+
+    <label>Description
+        <textarea name="description" rows="3">{% if product %}{{ product.description }}{% endif %}</textarea>
+    </label>
+
+    <label>Price
+        <input type="number" step="0.01" name="price" required
+               value="{% if product %}{{ product.price }}{% else %}0.00{% endif %}">
+    </label>
+
+    <label>Upload Image
+        <input type="file" id="image_file">
+    </label>
+    
+    <input type="hidden" name="image_url" id="image_url"
+           value="{% if product %}{{ product.image_url }}{% endif %}">
+    
+    <label>Stock
+        <input type="number" name="stock" min="0"
+               value="{% if product %}{{ product.stock }}{% else %}0{% endif %}">
+    </label>
+
+    <button type="submit">Save</button>
+    <a href="/admin/dashboard">Cancel</a>
+</form>
+{% endblock %}

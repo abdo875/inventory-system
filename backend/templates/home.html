@@ -1,0 +1,23 @@
+<!-- templates/home.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="page-title">Products</h1>
+<div class="product-grid">
+    {% for product in products %}
+        <div class="product-card">
+            {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+            {% else %}
+                <div class="product-image placeholder">No Image</div>
+            {% endif %}
+            <h2>{{ product.name }}</h2>
+            <p class="product-price">${{ "%.2f" | format(product.price) }}</p>
+            <p class="product-desc">{{ product.description or "" }}</p>
+            <a href="/product/{{ product.id }}" class="btn btn-primary">View</a>
+        </div>
+    {% else %}
+        <p>No products yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

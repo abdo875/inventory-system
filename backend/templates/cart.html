@@ -1,0 +1,59 @@
+<!-- templates/cart.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="page-title">Your Cart</h1>
+
+{% if items %}
+<table class="cart-table">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="cart-items-body">
+        {% for item in items %}
+            <tr data-cart-item-id="{{ item.id }}">
+                <td class="cart-item-info">
+                    {% if item.product.image_url %}
+                        <img src="{{ item.product.image_url }}" class="cart-item-image">
+                    {% endif %}
+                    <span>{{ item.product.name }}</span>
+                </td>
+                <td>${{ "%.2f" | format(item.product.price) }}</td>
+                <td>
+                    <button class="btn-qty minus">-</button>
+                    <input type="number" class="qty-input" value="{{ item.quantity }}" min="1">
+                    <button class="btn-qty plus">+</button>
+                </td>
+                <td class="line-total">
+                    ${{ "%.2f" | format(item.product.price * item.quantity) }}
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-remove-item">Remove</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="cart-summary">
+    <p>Subtotal: <span id="cart-subtotal">${{ "%.2f" | format(subtotal) }}</span></p>
+    <form method="post" action="/checkout">
+        <button type="submit" class="btn btn-success">Checkout</button>
+    </form>
+</div>
+
+<script src="/static/js/cart.js"></script>
+<script>
+    setupCartPage();
+</script>
+
+{% else %}
+<p>Your cart is empty.</p>
+{% endif %}
+{% endblock %}
