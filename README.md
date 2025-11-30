@@ -53,29 +53,6 @@ This project is developed as part of the **DEPI DevOps Track Graduation Project*
 
 ---
 
-## 📁 Project Structure
-
-inventory-system/
-│
-├── backend/
-│   ├── main.py
-│   ├── models.py
-│   ├── database.py
-│   ├── crud.py
-│   ├── schemas.py
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   ├── templates/
-│   │    └── index.html
-│   └── static/
-│        └── style.css
-│
-└── monitoring/
-    ├── docker-compose-monitor.yml
-    └── prometheus.yml
-
----
-
 ## 🐳 Backend – Docker Build & Run
 
 docker build -t inventory-backend .
