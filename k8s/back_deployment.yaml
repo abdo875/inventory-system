@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: depi
+  labels:
+    app: inventory-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-backend
+  template:
+    metadata:
+      labels:
+        app: inventory-backend
+    spec:
+      containers:
+        - name: backend
+          image: omarehab01/backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
