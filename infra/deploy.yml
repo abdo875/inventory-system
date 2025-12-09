@@ -15,17 +15,17 @@
 
     - name: Copy namespace manifest
       copy:
-        src: infra/k8s/namespace.yml
+        src: k8s/namespace.yml
         dest: "{{ k8s_dir }}/namespace.yml"
 
     - name: Copy deployment manifest
       copy:
-        src: infra/k8s/deployment.yml
+        src: k8s/deployment.yml
         dest: "{{ k8s_dir }}/deployment.yml"
 
     - name: Copy service manifest
       copy:
-        src: infra/k8s/service.yml
+        src: k8s/service.yml
         dest: "{{ k8s_dir }}/service.yml"
 
     - name: Apply namespace
