@@ -1,6 +1,5 @@
 [ec2]
-ec2-13-53-198-106.eu-north-1.compute.amazonaws.com ansible_user=ubuntu ansible_ssh_private_key_file=/var/jenkins_home/project-key.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'
-
+ec2-13-53-198-106.eu-north-1.compute.amazonaws.com ansible_user=ubuntu ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
