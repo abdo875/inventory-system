@@ -12,7 +12,7 @@
     - name: Copy Kubernetes manifests
       copy:
         src: "{{ item }}"
-        dest: "/home/ubuntu/k8s-inventory/{{ item | basename }}"
+        dest: "{{ k8s_dir }}/"
       loop:
         - infra/k8s/namespace.yml
         - infra/k8s/deployment.yml
