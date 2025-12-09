@@ -1,0 +1,49 @@
+---
+- name: Setup EC2 with Docker, kubectl and kind
+  hosts: ec2
+  become: yes
+
+  tasks:
+    - name: Update apt
+      apt: { update_cache: yes }
+
+    - name: Install dependencies
+      apt:
+        name:
+          - docker.io
+          - curl
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+        state: present
+
+    - name: Enable docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Add user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Install kubectl
+      get_url:
+        url: https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: Install kind
+      get_url:
+        url: https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64
+        dest: /usr/local/bin/kind
+        mode: '0755'
+
+    - name: Create kind cluster if not exists
+      become: false
+      shell: |
+        if ! kind get clusters | grep -q inventory-cluster; then
+          kind create cluster --name inventory-cluster
+        fi

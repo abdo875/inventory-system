@@ -1,51 +1,38 @@
-- hosts: app
-  become: true
+---
+- name: Deploy inventory app to kind
+  hosts: ec2
+  become: false
+
   vars:
-    backend_image: "{{ image_backend | default('abdelrahman121/inventory-backend:latest') }}"
+    k8s_dir: /home/ubuntu/k8s-inventory
+
   tasks:
-    - name: update apt
-      apt: update_cache=yes force_apt_get=yes
-
-    - name: Ensure docker installed
-      apt:
-        name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release]
-        state: present
-
-    - name: Add Docker GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: Add docker repo
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
-        state: present
-
-    - name: Install docker
-      apt:
-        name: [docker-ce, docker-ce-cli, containerd.io]
-        state: latest
-        update_cache: yes
-
-    - name: install docker-compose plugin
-      apt:
-        name: docker-compose-plugin
-        state: present
-
-    - name: create app dir
+    - name: Create folder for manifests
       file:
-        path: /opt/inventory
+        path: "{{ k8s_dir }}"
         state: directory
-        owner: ubuntu
-        mode: '0755'
 
-    - name: pull backend image
-      command: docker pull {{ backend_image }}
+    - name: Copy manifests
+      synchronize:
+        src: "{{ item }}"
+        dest: "{{ k8s_dir }}/"
+      with_items:
+        - infra/k8s/namespace.yml
+        - infra/k8s/deployment.yml
+        - infra/k8s/service.yml
 
-    - name: stop & remove old container
-      shell: |
-        docker rm -f inventory-backend || true
+    - name: Apply namespace
+      shell: kubectl apply -f {{ k8s_dir }}/namespace.yml
 
-    - name: run backend container
-      shell: |
-        docker run -d --name inventory-backend -p 8000:8000 --restart always {{ backend_image }}
+    - name: Apply deployment
+      shell: kubectl apply -f {{ k8s_dir }}/deployment.yml
+
+    - name: Apply service
+      shell: kubectl apply -f {{ k8s_dir }}/service.yml
+
+    - name: Get pods
+      shell: kubectl get pods -n inventory
+      register: pods_out
+
+    - debug:
+        var: pods_out.stdout
