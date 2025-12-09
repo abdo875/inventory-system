@@ -7,6 +7,9 @@ pipeline {
 
     stages {
 
+        /******************************
+         * Validate Branch
+         ******************************/
         stage('Validate Branch') {
             when {
                 expression {
@@ -19,16 +22,22 @@ pipeline {
             }
         }
 
+        /******************************
+         * Checkout
+         ******************************/
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
+        /******************************
+         * Build & Push Docker Image
+         ******************************/
         stage('Build & Push Docker Image') {
             when {
-                expression { 
-                    return env.GIT_BRANCH == "origin/k8s-deployment" || 
+                expression {
+                    return env.GIT_BRANCH == "origin/k8s-deployment" ||
                            env.BRANCH_NAME == "k8s-deployment"
                 }
             }
@@ -40,25 +49,38 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
+
                     script {
+                        def TAG = "build-${env.BUILD_NUMBER}"
+
                         sh """
                             echo "==> Building Docker Image"
-                            docker build -t ${DOCKER_IMAGE}:latest backend/
+                            docker build -t ${DOCKER_IMAGE}:${TAG} backend/
+                            docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
 
                             echo "==> Logging into DockerHub"
                             echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
-
-                            echo "==> Pushing to DockerHub (Safe Mode)"
-                            docker push --max-concurrent-uploads 1 ${DOCKER_IMAGE}:latest
                         """
+
+                        echo "==> Pushing Docker Image with retry logic"
+
+                        retry(3) {
+                            sh """
+                                docker push ${DOCKER_IMAGE}:${TAG}
+                                docker push ${DOCKER_IMAGE}:latest
+                            """
+                        }
                     }
                 }
             }
         }
 
+        /******************************
+         * Deploy to EC2 via Ansible
+         ******************************/
         stage('Deploy to EC2 via Ansible') {
             when {
-                expression { 
+                expression {
                     return env.GIT_BRANCH == "origin/k8s-deployment" ||
                            env.BRANCH_NAME == "k8s-deployment"
                 }
@@ -67,18 +89,21 @@ pipeline {
                 withCredentials([
                     sshUserPrivateKey(
                         credentialsId: 'aws-key',
-                        keyFileVariable: 'SSH_KEY'
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
                     )
                 ]) {
+
                     script {
                         sh """
                             echo "==> Running Ansible Deployment"
+
                             export ANSIBLE_HOST_KEY_CHECKING=False
 
                             ansible-playbook \
-                              -i infra/hosts \
-                              infra/deploy.yml \
-                              --private-key \$SSH_KEY
+                                -i infra/hosts \
+                                infra/deploy.yml \
+                                --private-key \$SSH_KEY
                         """
                     }
                 }
