@@ -1,6 +1,15 @@
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 *.db
+*.sqlite3
 .env
-.env.*
-*.pem
+venv/
+env/
+.cache/
+.git/
+.gitignore
+tests/
+*.log
+*.txt

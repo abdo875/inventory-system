@@ -48,8 +48,8 @@ pipeline {
                             echo "==> Logging into DockerHub"
                             echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
 
-                            echo "==> Pushing to DockerHub"
-                            docker push ${DOCKER_IMAGE}:latest
+                            echo "==> Pushing to DockerHub (Safe Mode)"
+                            docker push --max-concurrent-uploads 1 ${DOCKER_IMAGE}:latest
                         """
                     }
                 }
@@ -67,8 +67,7 @@ pipeline {
                 withCredentials([
                     sshUserPrivateKey(
                         credentialsId: 'aws-key',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
+                        keyFileVariable: 'SSH_KEY'
                     )
                 ]) {
                     script {
