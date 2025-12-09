@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "abdo875/inventory-system"
+        DOCKER_IMAGE = "abdelrahman121/inventory-backend"
     }
 
     stages {
@@ -27,15 +27,15 @@ pipeline {
 
         stage('Build & Push Docker Image') {
             when {
-                expression {
-                    return env.GIT_BRANCH == "origin/k8s-deployment" ||
+                expression { 
+                    return env.GIT_BRANCH == "origin/k8s-deployment" || 
                            env.BRANCH_NAME == "k8s-deployment"
                 }
             }
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'dockerhub-creds',   // ← ← CHANGED
+                        credentialsId: 'dockerhub-creds',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )
@@ -58,7 +58,7 @@ pipeline {
 
         stage('Deploy to EC2 via Ansible') {
             when {
-                expression {
+                expression { 
                     return env.GIT_BRANCH == "origin/k8s-deployment" ||
                            env.BRANCH_NAME == "k8s-deployment"
                 }
@@ -66,7 +66,7 @@ pipeline {
             steps {
                 withCredentials([
                     sshUserPrivateKey(
-                        credentialsId: 'aws-key',     // ← ← EC2 KEY ID
+                        credentialsId: 'aws-key',
                         keyFileVariable: 'SSH_KEY',
                         usernameVariable: 'SSH_USER'
                     )
