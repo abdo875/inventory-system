@@ -2,108 +2,59 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "abdelrahman121/inventory-backend"
+        DOCKER_USER  = credentials('dockerhub-creds').username
+        DOCKER_PASS  = credentials('dockerhub-creds').password
+        SSH_KEY      = credentials('aws-key')
+        IMAGE_NAME   = "abdelrahman121/inventory-backend"
     }
 
     stages {
 
-        /******************************
-         * Validate Branch
-         ******************************/
-        stage('Validate Branch') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == "origin/k8s-deployment" ||
-                           env.BRANCH_NAME == "k8s-deployment"
-                }
-            }
-            steps {
-                echo "Deploying branch: ${env.GIT_BRANCH}"
-            }
-        }
-
-        /******************************
-         * Checkout
-         ******************************/
+        /* --------------------- CHECKOUT ---------------------- */
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'k8s-deployment', url: 'https://github.com/abdo875/inventory-system.git'
             }
         }
 
-        /******************************
-         * Build & Push Docker Image
-         ******************************/
+        /* --------------------- BUILD IMAGE ---------------------- */
         stage('Build & Push Docker Image') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == "origin/k8s-deployment" ||
-                           env.BRANCH_NAME == "k8s-deployment"
-                }
-            }
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )
-                ]) {
+                script {
+                    echo "==> Building Docker Image"
+                    sh """
+                        docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} backend/
+                        docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest
+                    """
 
-                    script {
-                        def TAG = "build-${env.BUILD_NUMBER}"
+                    echo "==> Logging into DockerHub"
+                    sh """
+                        echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                    """
 
-                        sh """
-                            echo "==> Building Docker Image"
-                            docker build -t ${DOCKER_IMAGE}:${TAG} backend/
-                            docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:latest
-
-                            echo "==> Logging into DockerHub"
-                            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
-                        """
-
-                        echo "==> Pushing Docker Image with retry logic"
-
-                        retry(3) {
-                            sh """
-                                docker push ${DOCKER_IMAGE}:${TAG}
-                                docker push ${DOCKER_IMAGE}:latest
-                            """
-                        }
-                    }
+                    echo "==> Pushing image..."
+                    sh """
+                        docker push ${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker push ${IMAGE_NAME}:latest
+                    """
                 }
             }
         }
 
-        /******************************
-         * Deploy to EC2 via Ansible
-         ******************************/
+        /* --------------------- DEPLOY TO EC2 ---------------------- */
         stage('Deploy to EC2 via Ansible') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == "origin/k8s-deployment" ||
-                           env.BRANCH_NAME == "k8s-deployment"
-                }
-            }
             steps {
-                withCredentials([
-                    sshUserPrivateKey(
-                        credentialsId: 'aws-key',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
-                    )
-                ]) {
-
+                withCredentials([sshUserPrivateKey(credentialsId: 'aws-key', keyFileVariable: 'EC2_KEY')]) {
                     script {
-                        sh """
-                            echo "==> Running Ansible Deployment"
+                        echo "==> Running Ansible Deployment"
 
+                        sh """
                             export ANSIBLE_HOST_KEY_CHECKING=False
 
                             ansible-playbook \
                                 -i infra/hosts \
                                 infra/deploy.yml \
-                                --private-key \$SSH_KEY
+                                --private-key ${EC2_KEY}
                         """
                     }
                 }

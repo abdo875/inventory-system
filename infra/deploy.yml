@@ -1,13 +1,12 @@
 ---
 - name: Deploy inventory app to kind
   hosts: ec2
-  become: false
+  become: yes
 
   vars:
-    k8s_dir: /home/ubuntu/k8s-inventory
+    k8s_dir: "/home/ubuntu/k8s-inventory"
 
   tasks:
-
     - name: Create folder for manifests
       file:
         path: "{{ k8s_dir }}"
@@ -15,31 +14,24 @@
 
     - name: Copy namespace manifest
       copy:
-        src: k8s/namespace.yml
+        src: "infra/k8s/namespace.yml"
         dest: "{{ k8s_dir }}/namespace.yml"
 
     - name: Copy deployment manifest
       copy:
-        src: k8s/deployment.yml
+        src: "infra/k8s/deployment.yml"
         dest: "{{ k8s_dir }}/deployment.yml"
 
     - name: Copy service manifest
       copy:
-        src: k8s/service.yml
+        src: "infra/k8s/service.yml"
         dest: "{{ k8s_dir }}/service.yml"
 
     - name: Apply namespace
-      shell: kubectl apply -f {{ k8s_dir }}/namespace.yml
+      command: kubectl apply -f {{ k8s_dir }}/namespace.yml
 
     - name: Apply deployment
-      shell: kubectl apply -f {{ k8s_dir }}/deployment.yml
+      command: kubectl apply -f {{ k8s_dir }}/deployment.yml
 
     - name: Apply service
-      shell: kubectl apply -f {{ k8s_dir }}/service.yml
-
-    - name: Get pods
-      shell: kubectl get pods -n inventory
-      register: pods_out
-
-    - debug:
-        var: pods_out.stdout
+      command: kubectl apply -f {{ k8s_dir }}/service.yml
