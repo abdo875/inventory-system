@@ -7,19 +7,26 @@
     k8s_dir: /home/ubuntu/k8s-inventory
 
   tasks:
+
     - name: Create folder for manifests
       file:
         path: "{{ k8s_dir }}"
         state: directory
 
-    - name: Copy manifests
-      synchronize:
-        src: "{{ item }}"
-        dest: "{{ k8s_dir }}/"
-      with_items:
-        - infra/k8s/namespace.yml
-        - infra/k8s/deployment.yml
-        - infra/k8s/service.yml
+    - name: Copy namespace manifest
+      copy:
+        src: infra/k8s/namespace.yml
+        dest: "{{ k8s_dir }}/namespace.yml"
+
+    - name: Copy deployment manifest
+      copy:
+        src: infra/k8s/deployment.yml
+        dest: "{{ k8s_dir }}/deployment.yml"
+
+    - name: Copy service manifest
+      copy:
+        src: infra/k8s/service.yml
+        dest: "{{ k8s_dir }}/service.yml"
 
     - name: Apply namespace
       shell: kubectl apply -f {{ k8s_dir }}/namespace.yml
