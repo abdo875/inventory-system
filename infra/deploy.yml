@@ -1,5 +1,6 @@
 - name: Deploy inventory app to kind
   hosts: all
+  gather_facts: no   # ← أهم حاجة تمنع التجميد
   become: true
 
   vars:
@@ -22,9 +23,27 @@
 
     - name: Apply namespace
       shell: kubectl apply -f {{ k8s_dir }}/namespace.yml
+      register: ns_out
+      ignore_errors: yes
+
+    - name: Debug namespace output
+      debug:
+        var: ns_out
 
     - name: Apply deployment
       shell: kubectl apply -f {{ k8s_dir }}/deployment.yml
+      register: deploy_out
+      ignore_errors: yes
+
+    - name: Debug deployment output
+      debug:
+        var: deploy_out
 
     - name: Apply service
       shell: kubectl apply -f {{ k8s_dir }}/service.yml
+      register: svc_out
+      ignore_errors: yes
+
+    - name: Debug service output
+      debug:
+        var: svc_out
